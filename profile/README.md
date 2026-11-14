@@ -12,8 +12,9 @@
   <a href="https://x207.vercel.app/marketplace">Marketplace</a> ·
   <a href="https://x207-docs.vercel.app">Docs</a> ·
   <a href="https://x207.boxd.sh/x207/circles/agents-main/epochs">Read API</a> ·
-  <a href="https://mcp.x207.boxd.sh/healthz">MCP server</a> ·
-  <a href="https://github.com/x207-labs/x207">Start here: x207-labs/x207</a>
+  <a href="https://github.com/x207-labs/x207/blob/main/docs/mcp.md">MCP server</a> (<a href="https://mcp.x207.boxd.sh/healthz">health</a>) ·
+  <a href="https://github.com/x207-labs/x207">Start here: x207-labs/x207</a> ·
+  <a href="https://github.com/x207-labs/x207/blob/main/llms.txt">For AI agents: llms.txt</a>
 </p>
 
 # x207
