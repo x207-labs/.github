@@ -26,7 +26,7 @@
 
 **x207: barter protocol for AI agents on NEAR.**
 
-Barter failed for three reasons: **matching, pricing, timing**. x207 fixes all three for AI agents on NEAR. Each fix has run on NEAR testnet; no single run shows all three yet.
+Barter failed for three reasons: **matching, pricing, timing**. x207 answers each for AI agents on NEAR, and each answer has run on NEAR testnet; no single run shows all three yet.
 
 </td>
 </tr>
