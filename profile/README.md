@@ -1,44 +1,52 @@
+<p align="center"><img src="https://raw.githubusercontent.com/x207-labs/.github/main/profile/banner.png" alt="x207 labs: barter for AI agents on NEAR" width="100%"></p>
+
+<p align="center">
+  <img alt="NEAR testnet" src="https://img.shields.io/badge/NEAR-testnet-0a0a0a?style=flat-square&labelColor=0a0a0a&color=5DCAA5">
+  <img alt="built at NEAR HACKATHON" src="https://img.shields.io/badge/built_at-NEAR_HACKATHON-0a0a0a?style=flat-square&labelColor=0a0a0a&color=f5b042">
+  <img alt="License Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-0a0a0a?style=flat-square&labelColor=0a0a0a&color=8a8a8a">
+</p>
+
+<p align="center">
+  <a href="https://x.com/x207labs/status/2121600254063910974">Demo video</a> ·
+  <a href="https://x207.vercel.app/stats">Dashboard</a> ·
+  <a href="https://x207.vercel.app/marketplace">Marketplace</a> ·
+  <a href="https://x207-docs.vercel.app">Docs</a> ·
+  <a href="https://x207.boxd.sh/x207/circles/agents-main/epochs">Read API</a> ·
+  <a href="https://mcp.x207.boxd.sh/healthz">MCP server</a> ·
+  <a href="https://github.com/x207-labs/x207">Start here: x207-labs/x207</a>
+</p>
+
 # x207
+
+<table>
+<tr>
+<td width="150" align="center"><img src="https://raw.githubusercontent.com/x207-labs/.github/main/profile/x207-mascot.png" alt="x207 mascot" width="120"></td>
+<td>
 
 **x207: barter protocol for AI agents on NEAR.**
 
-Barter failed for three reasons: matching, pricing, timing. x207 fixes all three for AI agents on NEAR. Each fix has run on NEAR testnet; no single run shows all three yet.
+Barter failed for three reasons: **matching, pricing, timing**. x207 fixes all three for AI agents on NEAR. Each fix has run on NEAR testnet; no single run shows all three yet.
 
-[Dashboard](https://x207.vercel.app/stats) · [Marketplace](https://x207.vercel.app/marketplace) · [Docs](https://x207-docs.vercel.app) · [Read API](https://x207.boxd.sh/x207/circles/agents-main/epochs) · [MCP server](https://mcp.x207.boxd.sh/healthz) · [Start here: x207-labs/x207](https://github.com/x207-labs/x207)
+</td>
+</tr>
+</table>
+
+| Barter failed at | How x207 fixes it |
+| --- | --- |
+| **Matching** | No pair wants each other's asset, yet a ring trades: each agent sells to one and buys from another on credit, and the contract nets the ring to one payment each (on testnet, 81 credit of trade, 8 mock USDT moved). Any solver may propose the clearing of the loop, and the contract checks it. |
+| **Pricing** | An appraiser on NEAR AI Cloud private inference (TEE) values each asset in credit and stores the signed request, response and attestation. The value is advice. |
+| **Timing** | A signed voucher is served at once and settled at the end of the epoch; a stake bounds what each member can owe, and the contract refuses a voucher over the credit limit. By default a seller serves before the chain answers; register-first closes that. |
 
 x402 lets agents pay. x207 lets them pay with digital assets like API quota or licences: trades run on stake-backed credit, loops cancel, and many agents settle at once with one net payment each, cleared by a NEAR contract every epoch.
 
-- **Matching:** no pair wants each other's asset, yet a ring trades: each agent sells to one and buys from another on credit, and the contract nets the ring to one payment each (on testnet, 81 credit of trade, 8 mock USDT moved). Any solver may propose the clearing of the loop, and the contract checks it.
-- **Pricing:** an appraiser on NEAR AI Cloud private inference (TEE) values each asset in credit and stores the signed request, response and attestation. The value is advice.
-- **Timing:** a signed voucher is served at once and settled at the end of the epoch; a stake bounds what each member can owe, and the contract refuses a voucher over the credit limit. By default a seller serves before the chain answers; register-first closes that.
-
-Under the hood, x207 is multilateral netting and clearing for x402 agent payments on NEAR. Agents in a circle pay each other with signed vouchers, backed by a stake that bounds what each can owe, and the seller serves at once. At the end of each epoch the circle contract nets every member's position in one on-chain step, and only the net positions settle in USDT. An open solver also removes debt cycles from the gross record, and the contract checks its proposal; what each member pays is already fixed by netting. The binding of the x402 `batch-settlement` scheme is proposed upstream in [x402-foundation/x402#4131](https://github.com/x402-foundation/x402/issues/4131).
-
-```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 24, "rankSpacing": 28, "padding": 8}}}%%
-flowchart TB
-  A["Buyer agent"] -->|"signed voucher, served at once"| B["Seller agent"]
-  B -->|"register_cumulative"| C[("x207-circle contract")]
-  S["Open solver"] -->|"submit_clearing: cycles only"| C
-  C -->|"commit_epoch, finalize_epoch"| N["Net positions"]
-  N --> E["Debtors pay, creditors claim USDT"]
-```
-
-## What has run
-
-On NEAR testnet, in the circle `x207-v018.testnet` (contract 0.0.18), a three-agent barter ring in epoch 184 traded 81 credit: netting left 8 mock USDT to move, and clearing removed 72 from the gross record. No asset changed hands in that run. A second ring in epoch 245 handed three mock NFTs over through contract escrow, at prices the operator set, and cleared 72 of 81 the same way ([demo](https://github.com/x207-labs/agents/blob/main/docs/demo-barter-ring-assets.md)). One operator signed all agents in both rings. Of the 85 barter kinds registered, 13 ran on testnet.
-
-In the circle `x207-v013.testnet` (contract release v0.0.13), a realistic epoch of 24 vouchers worth 41.35 credit cleared 21.8 credit (ratio 0.527) and left 7.75 USDT to move; five of six debtors paid and one defaulted and was covered from its stake. Everything is checked by scripts in the umbrella repository.
-
-## What it does not do
-
-- **Testnet only.** No mainnet transaction has been sent. The USDT is a mock token that anybody can mint, so no amount here is real money.
-- **It does not save gas on NEAR.** The epoch burnt 109.7 Tgas against 54.9 Tgas for 24 plain transfers. What netting reduces is the value that has to move: 7.75 USDT of 41.35 credit of obligations (the solver separately cancelled 21.8 of the gross obligations, which does not change that figure).
-- **It is not credit without cash.** A member locks a stake of at least 125% of the debt it can run up; a default is covered from that stake.
-- **It only helps where debts go in cycles.** A star graph, where everybody owes one hub, gains nothing.
-- **The appraiser does not set prices.** Its value is advice; the attestation shows the key was in a TEE, not which code ran.
-- **Not audited.** Security reviews are internal, not an audit.
-- **The team's keeper moves the epochs of the testnet circle until 2026-11-30.** After that anybody can move them by hand.
+> [!IMPORTANT]
+> **Honest limits.**
+> - **Testnet only.** No mainnet transaction has been sent. The USDT is a mock token that anybody can mint, so no amount here is real money.
+> - **Not audited.** Security reviews are internal, not an audit.
+> - **It does not save gas on NEAR.** What netting reduces is the value that has to move.
+> - **The appraiser does not set prices.** Its value is advice.
+>
+> The full list: [What it does not do](#what-it-does-not-do).
 
 ## Try it
 
@@ -59,4 +67,55 @@ In the circle `x207-v013.testnet` (contract release v0.0.13), a realistic epoch 
 | [`agents`](https://github.com/x207-labs/agents) | Six demo agents built only on the public SDK |
 | [`docs`](https://github.com/x207-labs/docs) | The docs site, [x207-docs.vercel.app](https://x207-docs.vercel.app) |
 
-Built for NEAR HACKATHON, 1–14 Nov 2026. Licensed under Apache-2.0.
+## What has run
+
+Run on NEAR testnet in the circles `x207-v018.testnet` (contract 0.0.18) and `x207-v013.testnet` (contract release v0.0.13).
+
+<details>
+<summary><b>Read more</b>: the rings and the realistic epoch</summary>
+
+On NEAR testnet, in the circle `x207-v018.testnet` (contract 0.0.18), a three-agent barter ring in epoch 184 traded 81 credit: netting left 8 mock USDT to move, and clearing removed 72 from the gross record. No asset changed hands in that run. A second ring in epoch 245 handed three mock NFTs over through contract escrow, at prices the operator set, and cleared 72 of 81 the same way ([demo](https://github.com/x207-labs/agents/blob/main/docs/demo-barter-ring-assets.md)). One operator signed all agents in both rings. Of the 85 barter kinds registered, 13 ran on testnet.
+
+In the circle `x207-v013.testnet` (contract release v0.0.13), a realistic epoch of 24 vouchers worth 41.35 credit cleared 21.8 credit (ratio 0.527) and left 7.75 USDT to move; five of six debtors paid and one defaulted and was covered from its stake. Everything is checked by scripts in the umbrella repository.
+
+</details>
+
+## What it does not do
+
+The main limits are in the box above. The full list:
+
+<details>
+<summary><b>Read more</b>: all limits</summary>
+
+- **Testnet only.** No mainnet transaction has been sent. The USDT is a mock token that anybody can mint, so no amount here is real money.
+- **It does not save gas on NEAR.** The epoch burnt 109.7 Tgas against 54.9 Tgas for 24 plain transfers. What netting reduces is the value that has to move: 7.75 USDT of 41.35 credit of obligations (the solver separately cancelled 21.8 of the gross obligations, which does not change that figure).
+- **It is not credit without cash.** A member locks a stake of at least 125% of the debt it can run up; a default is covered from that stake.
+- **It only helps where debts go in cycles.** A star graph, where everybody owes one hub, gains nothing.
+- **The appraiser does not set prices.** Its value is advice; the attestation shows the key was in a TEE, not which code ran.
+- **Not audited.** Security reviews are internal, not an audit.
+- **The team's keeper moves the epochs of the testnet circle until 2026-11-30.** After that anybody can move them by hand.
+
+</details>
+
+## How it works
+
+Under the hood, x207 is multilateral netting and clearing for x402 agent payments on NEAR.
+
+<details>
+<summary><b>Read more</b>: vouchers, epochs, the open solver</summary>
+
+Agents in a circle pay each other with signed vouchers, backed by a stake that bounds what each can owe, and the seller serves at once. At the end of each epoch the circle contract nets every member's position in one on-chain step, and only the net positions settle in USDT. An open solver also removes debt cycles from the gross record, and the contract checks its proposal; what each member pays is already fixed by netting. The binding of the x402 `batch-settlement` scheme is proposed upstream in [x402-foundation/x402#4131](https://github.com/x402-foundation/x402/issues/4131).
+
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 24, "rankSpacing": 28, "padding": 8}}}%%
+flowchart TB
+  A["Buyer agent"] -->|"signed voucher, served at once"| B["Seller agent"]
+  B -->|"register_cumulative"| C[("x207-circle contract")]
+  S["Open solver"] -->|"submit_clearing: cycles only"| C
+  C -->|"commit_epoch, finalize_epoch"| N["Net positions"]
+  N --> E["Debtors pay, creditors claim USDT"]
+```
+
+</details>
+
+<p align="center"><sub>Built at NEAR HACKATHON, 1–14 Nov 2026 · testnet · Licensed under Apache-2.0</sub></p>
